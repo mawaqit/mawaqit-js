@@ -240,6 +240,33 @@ describe('prayerDay', () => {
     });
   });
 
+  test('a mistake of the mosque does not move the next prayers to the next day', () => {
+    // 16:30 for Fajr, rather than 06:30.
+    const day = prayerDay(
+      prayerTimes({ '01-01': ['16:30', '07:30', '13:00', '16:00', '19:00', '20:30'] }),
+      '2026-01-01',
+    );
+
+    expect([day?.fajr, day?.shuruq, day?.dhuhr, day?.isha].map((p) => p?.at.toISOString())).toEqual(
+      [
+        '2026-01-01T15:30:00.000Z',
+        '2026-01-01T06:30:00.000Z',
+        '2026-01-01T12:00:00.000Z',
+        '2026-01-01T19:30:00.000Z',
+      ],
+    );
+  });
+
+  test('an Isha before Maghrib by mistake stays the same day', () => {
+    // The next day would be 23:30 after Maghrib.
+    const day = prayerDay(
+      prayerTimes({ '01-01': ['06:00', '07:30', '13:00', '16:00', '21:00', '20:30'] }),
+      '2026-01-01',
+    );
+
+    expect(day?.isha?.at.toISOString()).toBe('2026-01-01T19:30:00.000Z');
+  });
+
   test.each([
     ['--', 'empty'],
     ['', 'empty'],

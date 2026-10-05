@@ -1,0 +1,6 @@
+{
+  // Typechecks the built declarations like a strict project of a user would.
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "types": [], "customConditions": [], "skipLibCheck": false },
+  "include": ["dist/**/*.d.ts"]
+}
