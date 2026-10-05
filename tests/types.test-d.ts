@@ -12,6 +12,13 @@ import {
   type RateLimitError,
 } from '@mawaqit/sdk';
 import { HijriMonth, type HijriSettingsLike, today } from '@mawaqit/sdk/hijri';
+import {
+  nextPrayer,
+  type Prayer,
+  type PrayerName,
+  type PrayerTimesLike,
+  prayerDay,
+} from '@mawaqit/sdk/prayer-times';
 import { describe, expectTypeOf, test } from 'vitest';
 
 const client = new Mawaqit();
@@ -79,4 +86,24 @@ test('Hijri', () => {
   expectTypeOf<HijriMonth>().toEqualTypeOf<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>();
   expectTypeOf<PrayerTimes>().toExtend<HijriSettingsLike>();
   expectTypeOf(today).parameter(1).toEqualTypeOf<string>();
+});
+
+test('prayer times', () => {
+  const prayerTimes = {} as PrayerTimes;
+  expectTypeOf<PrayerTimes>().toExtend<PrayerTimesLike>();
+  const day = prayerDay(prayerTimes, '2026-10-05');
+  // No valid row that day, or no valid time for a prayer.
+  expectTypeOf(day?.fajr).toEqualTypeOf<Prayer | null | undefined>();
+  expectTypeOf(day?.jumua).toEqualTypeOf<readonly Prayer[] | undefined>();
+  expectTypeOf<Prayer['name']>().toEqualTypeOf<PrayerName>();
+  expectTypeOf<Prayer['iqama']>().toEqualTypeOf<{
+    readonly time: string;
+    readonly at: Date;
+  } | null>();
+  expectTypeOf(
+    nextPrayer(prayerTimes, { now: new Date(), iqama: true }),
+  ).toEqualTypeOf<Prayer | null>();
+  prayerDay(prayerTimes, { year: 2026, month: 10, day: 5 });
+  // @ts-expect-error A day, not an instant.
+  prayerDay(prayerTimes, new Date());
 });

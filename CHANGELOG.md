@@ -4,6 +4,11 @@ All notable changes to this library. It follows [Semantic Versioning](https://se
 
 ## Unreleased
 
+### Added
+
+- `@mawaqit/sdk/prayer-times`: `prayerDay()`, the prayers of a day with their instants, iqama,
+  Imsak and Jumu'a; `nextPrayer()`; and `night()`, the thirds of the night.
+
 ## 1.0.0-beta.1 - 2026-10-05
 
 The first release, with the operations, errors, retries and Hijri dates of mawaqit-py 2.0.0.

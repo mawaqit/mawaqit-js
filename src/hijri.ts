@@ -22,7 +22,10 @@
  * @module
  */
 
+import { dayIn, type GregorianDay, unixDay } from './dates.ts';
 import type { HijriSettings } from './types.ts';
+
+export type { GregorianDay } from './dates.ts';
 
 /** A month of the Hijri calendar, named like in the MAWAQIT apps. */
 export const HijriMonth = {
@@ -106,15 +109,6 @@ export class HijriDate {
 /** The Hijri settings of a mosque, from `client.mosques.hijriSettings()`. */
 export type HijriSettingsLike = Pick<HijriSettings, 'hijriAdjustment' | 'hijriDateForceTo30'>;
 
-/**
- * A Gregorian day: an ISO date like `"2026-10-05"`, or an object with its `year`, `month` from 1 to
- * 12 and `day`, like a `Temporal.PlainDate`.
- */
-export type GregorianDay =
-  | string
-  | { readonly year: number; readonly month: number; readonly day: number };
-
-const DAY = 86_400_000;
 // 1 January 1970 is the day 719163 of the proleptic Gregorian calendar.
 const ORDINAL_OF_UNIX_EPOCH = 719_163;
 // Julian Day Number of the day 0, and of 16 July 622, the first day of the calendar.
@@ -153,20 +147,7 @@ export function kuwaiti(day: GregorianDay): HijriDate {
  * @throws {RangeError} The day is not a valid date.
  */
 export function fromGregorian(day: GregorianDay, settings?: HijriSettingsLike): HijriDate {
-  if (!settings) {
-    return kuwaiti(day);
-  }
-  const hijri = kuwaitiOfUnixDay(unixDay(day) + settings.hijriAdjustment);
-  if (!settings.hijriDateForceTo30) {
-    return hijri;
-  }
-  if (hijri.day !== 1) {
-    return new HijriDate(hijri.year, hijri.month, 30);
-  }
-  if (hijri.month === HijriMonth.MUHARRAM) {
-    return new HijriDate(hijri.year - 1, HijriMonth.DHU_AL_HIJJAH, 30);
-  }
-  return new HijriDate(hijri.year, (hijri.month - 1) as HijriMonth, 30);
+  return fromUnixDay(unixDay(day), settings);
 }
 
 /**
@@ -182,17 +163,24 @@ export function fromGregorian(day: GregorianDay, settings?: HijriSettingsLike): 
  * @throws {RangeError} The time zone is unknown.
  */
 export function today(settings: HijriSettingsLike, timeZone: string): HijriDate {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    calendar: 'gregory',
-    numberingSystem: 'latn',
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-  }).formatToParts(new Date());
-  const part = (type: Intl.DateTimeFormatPartTypes): number =>
-    Number(parts.find((p) => p.type === type)?.value);
-  return fromGregorian({ year: part('year'), month: part('month'), day: part('day') }, settings);
+  return fromUnixDay(dayIn(Date.now(), timeZone), settings);
+}
+
+function fromUnixDay(day: number, settings: HijriSettingsLike | undefined): HijriDate {
+  if (!settings) {
+    return kuwaitiOfUnixDay(day);
+  }
+  const hijri = kuwaitiOfUnixDay(day + settings.hijriAdjustment);
+  if (!settings.hijriDateForceTo30) {
+    return hijri;
+  }
+  if (hijri.day !== 1) {
+    return new HijriDate(hijri.year, hijri.month, 30);
+  }
+  if (hijri.month === HijriMonth.MUHARRAM) {
+    return new HijriDate(hijri.year - 1, HijriMonth.DHU_AL_HIJJAH, 30);
+  }
+  return new HijriDate(hijri.year, (hijri.month - 1) as HijriMonth, 30);
 }
 
 function kuwaitiOfUnixDay(unixDay: number): HijriDate {
@@ -203,30 +191,6 @@ function kuwaitiOfUnixDay(unixDay: number): HijriDate {
   days -= Math.floor(year * YEAR_DAYS + SHIFT);
   const month = Math.min(Math.floor((days + 28.5001) / 29.5), 12) as HijriMonth;
   return new HijriDate(30 * cycle + year, month, days - Math.floor(29.5001 * month - 29));
-}
-
-/** Return the number of days between 1 January 1970 and a Gregorian day. */
-function unixDay(day: GregorianDay): number {
-  const { year, month, day: dayOfMonth } = typeof day === 'string' ? parseISODate(day) : day;
-  const date = new Date(0);
-  // Unlike `Date.UTC()`, keeps the years 0 to 99 as they are.
-  date.setUTCFullYear(year, month - 1, dayOfMonth);
-  if (
-    date.getUTCFullYear() !== year ||
-    date.getUTCMonth() !== month - 1 ||
-    date.getUTCDate() !== dayOfMonth
-  ) {
-    throw new RangeError(`Invalid date: ${year}-${month}-${dayOfMonth}.`);
-  }
-  return date.getTime() / DAY;
-}
-
-function parseISODate(text: string): { year: number; month: number; day: number } {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
-  if (!match) {
-    throw new RangeError(`Invalid date: ${JSON.stringify(text)}. Use YYYY-MM-DD.`);
-  }
-  return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
 }
 
 function isInRange(value: number, max: number): boolean {

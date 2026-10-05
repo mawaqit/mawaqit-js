@@ -30,6 +30,11 @@
       "types": "./dist/hijri.d.ts",
       "default": "./dist/hijri.js"
     },
+    "./prayer-times": {
+      "@mawaqit/source": "./src/prayer-times.ts",
+      "types": "./dist/prayer-times.d.ts",
+      "default": "./dist/prayer-times.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as sdk from '@mawaqit/sdk';
 import * as hijri from '@mawaqit/sdk/hijri';
+import * as prayerTimes from '@mawaqit/sdk/prayer-times';
 import { expect, test } from 'vitest';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
@@ -42,4 +43,5 @@ test('the public API', () => {
     'monthName',
     'today',
   ]);
+  expect(Object.keys(prayerTimes).sort()).toEqual(['nextPrayer', 'night', 'prayerDay']);
 });
