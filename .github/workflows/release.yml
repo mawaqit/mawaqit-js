@@ -1,0 +1,56 @@
+name: Release
+
+# Publishes a GitHub release to npm, with trusted publishing and provenance.
+# npm trusts this file name: renaming it breaks the publication.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    uses: $/.github/workflows/ci.yml
+
+  npm:
+    name: Publish to npm
+    needs: ci
+    runs-on: ubuntu-latest
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/@mawaqit/sdk
+    permissions:
+      id-token: write # Trusted publishing and provenance.
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          package-manager-cache: false
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - name: Check that the tag is the version of the package
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION=$(jq -r .version package.json)
+          if [ "${TAG#v}" != "$VERSION" ]; then
+            echo "::error::The tag $TAG is not the version of the package, $VERSION."
+            exit 1
+          fi
+      - run: pnpm build
+      - name: Publish
+        env:
+          PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          TAG=latest
+          if [ "$PRERELEASE" = true ]; then TAG=next; fi
+          npm publish --provenance --access public --tag "$TAG"

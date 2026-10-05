@@ -1,0 +1,3 @@
+[codespell]
+# Real API responses, in French among others.
+skip = ./node_modules,./dist,./coverage,./tests/examples,./tests/data,./pnpm-lock.yaml

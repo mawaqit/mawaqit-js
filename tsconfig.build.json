@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    // Every export has explicit types, so its declarations never depend on inference.
+    "isolatedDeclarations": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    // The library runs on any runtime with fetch: no Node.js types.
+    "types": [],
+    "customConditions": [],
+    "declarationMap": true,
+    "sourceMap": true,
+    "stripInternal": true
+  },
+  "include": ["src"]
+}

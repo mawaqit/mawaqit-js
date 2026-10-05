@@ -1,0 +1,67 @@
+{
+  "name": "@mawaqit/sdk",
+  "version": "1.0.0-beta.1",
+  "description": "The official TypeScript library for the MAWAQIT API.",
+  "keywords": [
+    "mawaqit",
+    "mosque",
+    "prayer times",
+    "hijri",
+    "api",
+    "sdk"
+  ],
+  "homepage": "https://mawaqit.net",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mawaqit/mawaqit-js.git"
+  },
+  "bugs": "https://github.com/mawaqit/mawaqit-js/issues",
+  "license": "Apache-2.0",
+  "author": "MAWAQIT <support@mawaqit.net>",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@mawaqit/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./hijri": {
+      "@mawaqit/source": "./src/hijri.ts",
+      "types": "./dist/hijri.d.ts",
+      "default": "./dist/hijri.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "NOTICE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.12"
+  },
+  "packageManager": "pnpm@11.9.0",
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "check": "biome check . && tsc && pnpm run test && pnpm run build && pnpm run check:package",
+    "check:package": "publint --strict && attw --pack --profile esm-only",
+    "codegen": "node codegen/generate.ts",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "test": "vitest run --project unit --coverage",
+    "test:live": "vitest run --project live",
+    "typecheck": "tsc",
+    "example": "node --conditions=@mawaqit/source examples/quickstart.ts"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@biomejs/biome": "^2.5.15",
+    "@types/node": "^26.6.4",
+    "@vitest/coverage-v8": "^5.0.3",
+    "publint": "^0.3.25",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3",
+    "yaml": "^2.9.1"
+  }
+}
