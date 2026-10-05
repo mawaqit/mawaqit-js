@@ -18,6 +18,8 @@ read their prayer times, iqama times, Hijri date and screen settings.
   like a latitude without a longitude, do not compile.
 - **Robust**: retries with backoff, timeouts, cancellation, and one error class per kind of
   failure.
+- **Helpers** for the prayers of a day, the next prayer and the Hijri date, which handle iqama
+  offsets, Imsak, Jumu'a and daylight saving time.
 - **Zero dependencies**: it only needs `fetch`, so it runs on Node.js, Deno, Bun, Cloudflare
   Workers and in browsers.
 - **Generated from the OpenAPI description of the API**, like the
