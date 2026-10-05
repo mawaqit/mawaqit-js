@@ -50,7 +50,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check": "biome check . && tsc && pnpm run test && pnpm run build && pnpm run check:package",
-    "check:package": "publint --strict && attw --pack --profile esm-only",
+    "check:package": "publint --strict && attw --pack --profile esm-only && tsc -p tsconfig.dist.json",
     "codegen": "node codegen/generate.ts",
     "lint": "biome check .",
     "format": "biome check --write .",

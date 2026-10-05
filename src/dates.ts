@@ -1,5 +1,7 @@
 /**
- * @internal Gregorian days and wall-clock times in any time zone, with `Intl` only.
+ * Gregorian days and wall-clock times in any time zone, with `Intl` only. Internal to the
+ * package, but not tagged so: the tag would strip `GregorianDay`, the first declaration, from the
+ * types.
  *
  * Days are counted from 1 January 1970, and instants are milliseconds since then.
  *

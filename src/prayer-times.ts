@@ -131,8 +131,9 @@ export interface Night {
 const CALENDAR = ['fajr', 'shuruq', 'dhuhr', 'asr', 'maghrib', 'isha'] as const;
 const IQAMA = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'] as const;
 const FRIDAY = 5;
-// An iqama later than this after its adhan is an error of the mosque.
-const MAX_IQAMA_DELAY = 12 * 60 * MINUTE;
+// An iqama this late after its adhan, or an Isha this late after Maghrib, is a mistake of the
+// mosque.
+const HALF_DAY = 12 * 60 * MINUTE;
 
 /**
  * Return the prayers of a day.
@@ -238,12 +239,14 @@ function dayOf(prayerTimes: PrayerTimesLike, date: number): PrayerDay | null {
     if (minutes === null) {
       return null;
     }
-    // A time earlier than the prayer before it is after midnight, like Isha far from the equator.
     let on = date;
     let at = zonedInstant(on, minutes, timeZone);
-    if (after && at < after.at.getTime()) {
+    // An Isha earlier than Maghrib is after midnight, in summer far from the equator. Not any
+    // other prayer: a mistake of the mosque, like 16:30 for Fajr, would move the whole day.
+    const nextDay = zonedInstant(date + 1, minutes, timeZone);
+    if (after && at < after.at.getTime() && nextDay - after.at.getTime() < HALF_DAY) {
       on += 1;
-      at = zonedInstant(on, minutes, timeZone);
+      at = nextDay;
     }
     const adhan = instant(at, timeZone);
     return { name, ...adhan, iqama: iqama ? resolveIqama(adhan, iqama, on, timeZone) : null };
@@ -259,7 +262,7 @@ function dayOf(prayerTimes: PrayerTimesLike, date: number): PrayerDay | null {
   let last: Prayer | null = null;
   for (const [i, name] of CALENDAR.entries()) {
     const iqama = name === 'shuruq' ? undefined : iqamas[i === 0 ? 0 : i - 1];
-    prayers[name] = prayer(name, times[i], iqama, last);
+    prayers[name] = prayer(name, times[i], iqama, name === 'isha' ? last : null);
     last = prayers[name] ?? last;
   }
   const { fajr, dhuhr } = prayers;
@@ -305,7 +308,7 @@ function resolveIqama(
       at = zonedInstant(date + 1, minutes, timeZone);
     }
   }
-  return at - adhanAt < MAX_IQAMA_DELAY ? instant(at, timeZone) : null;
+  return at - adhanAt < HALF_DAY ? instant(at, timeZone) : null;
 }
 
 function instant(at: number, timeZone: string): PrayerTime {
