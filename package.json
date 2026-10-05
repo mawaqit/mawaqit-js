@@ -1,6 +1,6 @@
 {
   "name": "@mawaqit/sdk",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0",
   "description": "The official TypeScript library for the MAWAQIT API.",
   "keywords": [
     "mawaqit",

@@ -4,6 +4,10 @@ All notable changes to this library. It follows [Semantic Versioning](https://se
 
 ## Unreleased
 
+## 1.0.0 - 2026-10-05
+
+The first stable release, with the changes of the betas below and these fixes.
+
 ### Fixed
 
 - A time entered by mistake earlier than the prayer before it, like 16:30 for Fajr, moved
