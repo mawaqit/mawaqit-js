@@ -46,8 +46,17 @@ jobs:
             echo "::error::The tag $TAG is not the version of the package, $VERSION."
             exit 1
           fi
+      - name: Skip a version already on npm
+        id: npm
+        run: |
+          if npm view "@mawaqit/sdk@$(jq -r .version package.json)" version > /dev/null 2>&1; then
+            echo "::notice::This version is already on npm."
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          fi
       - run: pnpm build
+        if: steps.npm.outputs.published != 'true'
       - name: Publish
+        if: steps.npm.outputs.published != 'true'
         env:
           PRERELEASE: ${{ github.event.release.prerelease }}
         run: |

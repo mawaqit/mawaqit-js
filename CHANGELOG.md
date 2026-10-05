@@ -4,7 +4,7 @@ All notable changes to this library. It follows [Semantic Versioning](https://se
 
 ## Unreleased
 
-## 1.0.0-beta.1
+## 1.0.0-beta.1 - 2026-10-05
 
 The first release, with the operations, errors, retries and Hijri dates of mawaqit-py 2.0.0.
 
