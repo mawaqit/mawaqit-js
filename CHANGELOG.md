@@ -4,6 +4,8 @@ All notable changes to this library. It follows [Semantic Versioning](https://se
 
 ## Unreleased
 
+## 1.0.0-beta.2 - 2026-10-05
+
 ### Added
 
 - `@mawaqit/sdk/prayer-times`: `prayerDay()`, the prayers of a day with their instants, iqama,
