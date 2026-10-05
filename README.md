@@ -67,6 +67,43 @@ optional.
 Every method but `search()` and `login()` needs an API token, passed as `token` or set in the
 `MAWAQIT_TOKEN` environment variable.
 
+### Prayer times of a day
+
+`client.mosques.prayerTimes()` returns the times of the whole year, as the mosque entered them.
+`@mawaqit/sdk/prayer-times` reads them for a day, with the instant of each prayer, the iqama
+resolved, Imsak, and Jumu'a on Fridays:
+
+```ts
+import { nextPrayer, night, prayerDay } from '@mawaqit/sdk/prayer-times';
+
+const prayerTimes = await client.mosques.prayerTimes(uuid);
+
+const today = prayerDay(prayerTimes); // Or prayerDay(prayerTimes, '2026-10-05').
+today?.fajr?.time; // '06:12', in the time zone of the mosque
+today?.fajr?.at; // A Date
+today?.fajr?.iqama?.time; // '06:30', even when the mosque entered '+18'
+today?.jumua; // The Jumu'a prayers on Fridays, or []
+
+const next = nextPrayer(prayerTimes); // Jumu'a instead of Dhuhr on Fridays.
+if (next) {
+  const minutes = Math.round((next.at.getTime() - Date.now()) / 60_000);
+  console.log(`${next.name} in ${minutes} min`); // asr in 42 min
+}
+
+night(prayerTimes)?.lastThirdStart; // The thirds of the night, from Maghrib to Fajr.
+```
+
+They handle what the raw calendar leaves to you:
+
+- Mosques that display Imsak have 7 times a day, with Sabah as Fajr.
+- Iqama times are `HH:MM` or minutes after the adhan, like `+10`.
+- An Isha after midnight, in summer far from the equator, belongs to the day before.
+- Times are converted in the time zone of the mosque, through daylight saving time changes.
+- A time entered by hand that is invalid gives a `null` prayer, rather than a wrong one.
+
+`nextPrayer()` takes `{ now, shuruq, jumua, iqama }` options: `iqama: true` gives the next iqama
+rather than the next adhan.
+
 ### Hijri date
 
 `@mawaqit/sdk/hijri` computes the Hijri date of a mosque from its settings, like the mosque
