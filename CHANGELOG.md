@@ -4,6 +4,18 @@ All notable changes to this library. It follows [Semantic Versioning](https://se
 
 ## Unreleased
 
+## 1.1.0 - 2026-10-08
+
+### Added
+
+- `client.hadiths.random()`: a random hadith in a language, as the mosque screens show it, or
+  `null` when none is shorter than `maxLength`. It needs no API token.
+
+### Fixed
+
+- `client.mosques.search()` sends the API token: the API has answered 401 without one since
+  6 October 2026, so the search failed with an `AuthenticationError`.
+
 ## 1.0.0 - 2026-10-05
 
 The first stable release, with the changes of the betas below and these fixes.

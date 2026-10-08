@@ -11,8 +11,8 @@
 > access the API from a third-party application, script or service: the API may block such
 > access without notice. Thank you for respecting this.
 
-The official TypeScript library for the [MAWAQIT](https://mawaqit.net) API: search mosques, and
-read their prayer times, iqama times, Hijri date and screen settings.
+The official TypeScript library for the [MAWAQIT](https://mawaqit.net) API: search mosques, read
+their prayer times, iqama times, Hijri date and screen settings, and draw a random hadith.
 
 - **Fully typed**: every parameter, response and field, documented in your editor. Invalid calls,
   like a latitude without a longitude, do not compile.
@@ -58,6 +58,7 @@ if (mosque) {
 | `client.mosques.hijriSettings(uuid)` | The `HijriSettings` of the mosque |
 | `client.mosques.config(uuid)` | The `MosqueConfig`: the settings of the mosque screens |
 | `client.mosques.flashMessage(uuid)` | The `FlashMessage` of the mosque screens, or `null` |
+| `client.hadiths.random({ lang })` | A random `Hadith` in a language, or `null` |
 | `client.auth.login({ email, password })` | The `Account`, with its API token |
 
 Responses are the JSON of the API, typed: fields keep the camelCase names of the API, like
@@ -66,8 +67,8 @@ optional.
 
 ### Authentication
 
-Every method but `search()` and `login()` needs an API token, passed as `token` or set in the
-`MAWAQIT_TOKEN` environment variable.
+Every method but `login()` and `hadiths.random()` needs an API token, passed as `token` or set in
+the `MAWAQIT_TOKEN` environment variable.
 
 ### Prayer times of a day
 

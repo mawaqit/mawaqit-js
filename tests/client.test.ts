@@ -123,7 +123,7 @@ describe('requests', () => {
   test('public operation without token', async () => {
     const { client, requests } = mockAPI([json([])], { token: undefined });
 
-    expect(await client.mosques.search({ word: 'paris' })).toEqual([]);
+    expect(await client.hadiths.random()).toBeNull();
     expect(requests[0]?.headers.has('Api-Access-Token')).toBe(false);
   });
 
@@ -206,7 +206,7 @@ describe('requests', () => {
     const fetch = vi.fn(async () => json([]));
     vi.stubGlobal('fetch', fetch);
 
-    await new Mawaqit().mosques.search({ word: 'paris' });
+    await new Mawaqit().hadiths.random();
 
     expect(fetch).toHaveBeenCalledOnce();
   });
