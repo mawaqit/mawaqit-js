@@ -108,6 +108,9 @@ test('prayer times', () => {
   expectTypeOf(
     nextPrayer(prayerTimes, { now: new Date(), iqama: true }),
   ).toEqualTypeOf<Prayer | null>();
+  nextPrayer(prayerTimes, { prayer: 'maghrib' });
+  // @ts-expect-error Prayers are named in English, in lowercase.
+  nextPrayer(prayerTimes, { prayer: 'Maghreb' });
   prayerDay(prayerTimes, { year: 2026, month: 10, day: 5 });
   // @ts-expect-error A day, not an instant.
   prayerDay(prayerTimes, new Date());
