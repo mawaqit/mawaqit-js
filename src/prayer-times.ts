@@ -105,6 +105,11 @@ export type PrayerTimesLike = Pick<
 export interface NextPrayerOptions {
   /** The instant to search from. Now by default. */
   now?: Date | undefined;
+  /**
+   * Only this prayer, like `'maghrib'` for the next Maghrib, every day. `shuruq` and `jumua` are
+   * then ignored: `'dhuhr'` is Dhuhr on Fridays too, and `'jumua'` the next Jumu'a.
+   */
+  prayer?: PrayerName | undefined;
   /** Whether Shuruq counts as a prayer. `false` by default. */
   shuruq?: boolean | undefined;
   /** Whether Jumu'a replaces Dhuhr on Fridays, when the mosque has one. `true` by default. */
@@ -131,6 +136,8 @@ export interface Night {
 const CALENDAR = ['fajr', 'shuruq', 'dhuhr', 'asr', 'maghrib', 'isha'] as const;
 const IQAMA = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'] as const;
 const FRIDAY = 5;
+// How many days a search for one prayer looks ahead: a week reaches the next Jumu'a.
+const SEARCH_DAYS = 8;
 // An iqama this late after its adhan, or an Isha this late after Maghrib, is a mistake of the
 // mosque.
 const HALF_DAY = 12 * 60 * MINUTE;
@@ -155,6 +162,8 @@ export function prayerDay(prayerTimes: PrayerTimesLike, day?: GregorianDay): Pra
  * After Isha, this is the Fajr of the next day. An Isha after midnight, in summer far from the
  * equator, is still the next prayer until its time.
  *
+ * With the `prayer` option, the next time of this prayer, like the next Maghrib for iftar.
+ *
  * @param prayerTimes - The prayer times of the mosque, from `client.mosques.prayerTimes()`.
  * @returns The next prayer, or `null` when the calendar of the mosque has no valid time around
  *   `now`.
@@ -166,23 +175,32 @@ export function nextPrayer(
 ): Prayer | null {
   const now = (options.now ?? new Date()).getTime();
   const today = dayIn(now, prayerTimes.timezone);
+  const only = options.prayer;
+  const days = only === undefined ? 3 : SEARCH_DAYS;
   let next: { prayer: Prayer; at: number } | null = null;
-  // Yesterday for an Isha after midnight.
-  for (const date of [today - 1, today, today + 1, today + 2]) {
+  // From yesterday, for an Isha after midnight.
+  for (let date = today - 1; date <= today + days - 1; date++) {
     const day = dayOf(prayerTimes, date);
     if (!day) {
       continue;
     }
     const jumua = options.jumua !== false && day.jumua.length > 0;
-    const prayers = [
-      day.fajr,
-      options.shuruq ? day.shuruq : null,
-      jumua ? null : day.dhuhr,
-      ...(jumua ? day.jumua : []),
-      day.asr,
-      day.maghrib,
-      day.isha,
-    ];
+    let prayers: (Prayer | null)[];
+    if (only === 'jumua') {
+      prayers = [...day.jumua];
+    } else if (only !== undefined) {
+      prayers = [day[only]];
+    } else {
+      prayers = [
+        day.fajr,
+        options.shuruq ? day.shuruq : null,
+        jumua ? null : day.dhuhr,
+        ...(jumua ? day.jumua : []),
+        day.asr,
+        day.maghrib,
+        day.isha,
+      ];
+    }
     for (const prayer of prayers) {
       if (!prayer) {
         continue;

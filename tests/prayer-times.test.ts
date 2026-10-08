@@ -389,6 +389,46 @@ describe('nextPrayer', () => {
     });
   });
 
+  test('one prayer: the next Maghrib, today or tomorrow', () => {
+    // Maghrib at 17:08 in Paris on 1 January.
+    expect(next('2026-01-01T10:00:00Z', { prayer: 'maghrib' })).toMatchObject({
+      name: 'maghrib',
+      at: '2026-01-01T16:08:00.000Z',
+    });
+    expect(next('2026-01-01T17:00:00Z', { prayer: 'maghrib' })).toMatchObject({
+      name: 'maghrib',
+      at: '2026-01-02T16:09:00.000Z',
+    });
+  });
+
+  test('one prayer: Dhuhr on Fridays, and the next Jumua a week later', () => {
+    // Friday 2 January, then Saturday 3 January.
+    expect(next('2026-01-02T10:00:00Z', { prayer: 'dhuhr' })).toMatchObject({ name: 'dhuhr' });
+    expect(next('2026-01-03T10:00:00Z', { prayer: 'jumua' })).toMatchObject({
+      name: 'jumua',
+      at: '2026-01-09T12:50:00.000Z',
+    });
+    // On a Friday after the last Jumu'a, the one of the next Friday.
+    expect(next('2026-01-02T14:00:00Z', { prayer: 'jumua' })).toMatchObject({
+      at: '2026-01-09T12:50:00.000Z',
+    });
+  });
+
+  test('one prayer: its iqama, and an Isha after midnight', () => {
+    expect(next('2026-01-01T12:02:00Z', { prayer: 'dhuhr', iqama: true })).toMatchObject({
+      name: 'dhuhr',
+      at: '2026-01-01T11:59:00.000Z',
+    });
+    const data = prayerTimes({ '06-20': ['03:00', '05:00', '13:55', '18:00', '22:30', '00:30'] });
+    expect(next('2026-06-20T22:15:00Z', { prayer: 'isha' }, data)).toMatchObject({
+      at: '2026-06-20T22:30:00.000Z',
+    });
+  });
+
+  test('one prayer the mosque never has', () => {
+    expect(next('2026-01-01T10:00:00Z', { prayer: 'imsak' })).toBeNull();
+  });
+
   test('skips invalid times and missing days', () => {
     const data = prayerTimes({ '01-01': ['06:00', '07:30', '13:00', '--', '19:00', '20:30'] });
 

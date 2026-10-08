@@ -4,6 +4,13 @@ All notable changes to this library. It follows [Semantic Versioning](https://se
 
 ## Unreleased
 
+## 1.2.0 - 2026-10-08
+
+### Added
+
+- `nextPrayer(prayerTimes, { prayer })`: the next time of one prayer, like the next Maghrib for
+  iftar, or the next Jumu'a. It looks up to a week ahead.
+
 ## 1.1.0 - 2026-10-08
 
 ### Added

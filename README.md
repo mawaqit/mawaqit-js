@@ -93,6 +93,8 @@ if (next) {
   console.log(`${next.name} in ${minutes} min`); // asr in 42 min
 }
 
+nextPrayer(prayerTimes, { prayer: 'maghrib' }); // The next Maghrib, today or tomorrow.
+
 night(prayerTimes)?.lastThirdStart; // The thirds of the night, from Maghrib to Fajr.
 ```
 
@@ -104,8 +106,9 @@ They handle what the raw calendar leaves to you:
 - Times are converted in the time zone of the mosque, through daylight saving time changes.
 - A time entered by hand that is invalid gives a `null` prayer, rather than a wrong one.
 
-`nextPrayer()` takes `{ now, shuruq, jumua, iqama }` options: `iqama: true` gives the next iqama
-rather than the next adhan.
+`nextPrayer()` takes `{ now, shuruq, jumua, iqama, prayer }` options: `iqama: true` gives the next
+iqama rather than the next adhan, and `prayer` the next time of one prayer, like `'maghrib'` for
+iftar or `'jumua'` for the next Friday.
 
 ### Hijri date
 
