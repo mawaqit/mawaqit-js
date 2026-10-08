@@ -4,6 +4,7 @@ import {
   type Account,
   type APIStatusError,
   type FlashMessage,
+  type Hadith,
   type InternalServerError,
   Mawaqit,
   type Mosque,
@@ -51,6 +52,10 @@ describe('search', () => {
 test('responses', () => {
   expectTypeOf(client.mosques.prayerTimes('uuid')).resolves.toEqualTypeOf<PrayerTimes>();
   expectTypeOf(client.mosques.flashMessage('uuid')).resolves.toEqualTypeOf<FlashMessage | null>();
+  expectTypeOf(client.hadiths.random()).resolves.toEqualTypeOf<Hadith | null>();
+  client.hadiths.random({ lang: 'fr-ar', maxLength: 300 });
+  // @ts-expect-error maxLength is a number.
+  client.hadiths.random({ maxLength: '300' });
   expectTypeOf(client.auth.login({ email: 'e', password: 'p' })).resolves.toEqualTypeOf<Account>();
   // @ts-expect-error IDs are numbers.
   client.mosques.get('256');

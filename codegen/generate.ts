@@ -78,6 +78,7 @@ interface Schema {
   properties?: Record<string, Schema>;
   additionalProperties?: Schema;
   required?: string[];
+  maxItems?: number;
   minimum?: number;
   maximum?: number;
   default?: unknown;
@@ -122,6 +123,10 @@ interface Spec {
 class SpecError extends Error {}
 
 // Text
+
+// The API answers some operations with `[]` for nothing, which the methods return as `null`.
+const isEmptyArray = (schema: Schema | undefined): boolean =>
+  schema?.type === 'array' && schema.maxItems === 0;
 
 const camel = (name: string): string => name.charAt(0).toLowerCase() + name.slice(1);
 const pascal = (name: string): string => name.charAt(0).toUpperCase() + name.slice(1);
@@ -216,7 +221,7 @@ class CodeGenerator {
     }
     if (schema.anyOf) {
       const [other, nullable, ...rest] = schema.anyOf;
-      if (!other?.$ref || nullable?.type !== 'null' || rest.length) {
+      if (!other?.$ref || (nullable?.type !== 'null' && !isEmptyArray(nullable)) || rest.length) {
         throw new SpecError(`unsupported anyOf ${JSON.stringify(schema.anyOf)}`);
       }
       return `${this.type(other, refs)} | null`;
@@ -325,7 +330,8 @@ class CodeGenerator {
       notes.push(`At least ${schema.minimum}`);
     }
     if (schema.default !== undefined) {
-      notes.push(`${schema.default} by default`);
+      const value = typeof schema.default === 'string' ? `\`${schema.default}\`` : schema.default;
+      notes.push(`${value} by default`);
     }
     const doc = this.text(param.description);
     return notes.length ? `${doc} ${notes.join(', ')}.` : doc;
@@ -385,7 +391,8 @@ class CodeGenerator {
       ),
     );
     const basicAuth = schemes.has('basicAuth');
-    const returns = this.type(this.#successSchema(spec), models);
+    const success = this.#successSchema(spec);
+    const returns = this.type(success, models);
     const paramsType = `${pascal(spec.operationId)}Params`;
     const declaration: string[] = [];
 
@@ -440,6 +447,7 @@ class CodeGenerator {
         `query: { ${queryParams.map((p) => `${p.name}: params.${p.name}`).join(', ')} }`,
       basicAuth && 'basicAuth: [params.email, params.password]',
       `authenticated: ${schemes.has('apiToken')}`,
+      isEmptyArray(success.anyOf?.[1]) && 'emptyAsNull: true',
     ].filter(Boolean);
     const method =
       `${doc}  ${name}(${args.join(', ')}): Promise<${returns}> {\n` +

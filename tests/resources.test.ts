@@ -26,7 +26,8 @@ test('search by words', async () => {
   const mosques = await client.mosques.search({ word: 'grande mosquee de paris' });
 
   expect(requests[0]?.url.search).toBe('?word=grande+mosquee+de+paris');
-  expect(requests[0]?.headers.has('Api-Access-Token')).toBe(false);
+  // The API has needed the token for searches since October 2026.
+  expect(requests[0]?.headers.has('Api-Access-Token')).toBe(true);
   expect(mosques[0]?.label).toBe('GRANDE MOSQUÉE DE PARIS');
   expect(mosques[0]?.proximity).toBeUndefined();
 });
@@ -102,6 +103,32 @@ test('no flash message', async () => {
   const { client } = mockAPI([json(example('mosquesFlashMessage', 'grande-mosquee-de-paris'))]);
 
   expect(await client.mosques.flashMessage(UUID)).toBeNull();
+});
+
+test('random hadith', async () => {
+  const { client, requests } = mockAPI([json(example('hadithsRandom', 'french'))]);
+
+  const hadith = await client.hadiths.random({ lang: 'fr-ar', maxLength: 300 });
+
+  expect(requests[0]?.url.pathname).toBe('/api/2.0/hadith/random');
+  expect(requests[0]?.url.search).toBe('?lang=fr-ar&maxLength=300');
+  expect(requests[0]?.headers.has('Api-Access-Token')).toBe(false);
+  expect(hadith?.lang).toBe('fr');
+  expect(hadith?.text).toContain('Allah');
+});
+
+test('random hadith in Arabic by default', async () => {
+  const { client, requests } = mockAPI([json(example('hadithsRandom', 'arabic'))]);
+
+  expect((await client.hadiths.random())?.lang).toBe('ar');
+  expect(requests[0]?.url.search).toBe('');
+});
+
+test('no hadith short enough', async () => {
+  const { client } = mockAPI([json(example('hadithsRandom', 'none-short-enough'))]);
+
+  // The API answers [], which would be truthy.
+  expect(await client.hadiths.random({ maxLength: 1 })).toBeNull();
 });
 
 test('fields the API adds later are kept', async () => {

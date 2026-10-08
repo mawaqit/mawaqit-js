@@ -6,14 +6,21 @@ import { describe, expect, test } from 'vitest';
 
 const client = new Mawaqit();
 
-test('search', async () => {
-  const mosques = await client.mosques.search({ lat: 48.8414, lon: 2.3557 });
+test('random hadith', async () => {
+  const hadith = await client.hadiths.random({ lang: 'fr' });
 
-  expect(mosques.length).toBeGreaterThan(0);
-  expect(mosques[0]?.proximity).toBeTypeOf('number');
+  expect(hadith?.lang).toBe('fr');
+  expect(await client.hadiths.random({ lang: 'fr', maxLength: 1 })).toBeNull();
 });
 
 describe.skipIf(!client.token)('with a token', () => {
+  test('search', async () => {
+    const mosques = await client.mosques.search({ lat: 48.8414, lon: 2.3557 });
+
+    expect(mosques.length).toBeGreaterThan(0);
+    expect(mosques[0]?.proximity).toBeTypeOf('number');
+  });
+
   test('a mosque', async () => {
     const [mosque] = await client.mosques.search({ word: 'grande mosquee de paris' });
     const uuid = mosque?.uuid ?? '';

@@ -92,6 +92,8 @@ export interface Operation {
   readonly basicAuth?: readonly [username: string, password: string];
   /** Whether the operation needs the API token. */
   readonly authenticated: boolean;
+  /** Whether an empty array, the answer of the API for nothing, is returned as `null`. */
+  readonly emptyAsNull?: boolean;
 }
 
 type Attempt = { response: Response; text: string } | { error: APIConnectionError };
@@ -187,7 +189,7 @@ export abstract class APIClient {
           // Retrying sooner than the API asks would only fail again.
           (retryAfter !== undefined && retryAfter > MAX_RETRY_AFTER)
         ) {
-          return parse<T>(request, response, text);
+          return parse<T>(request, response, text, operation.emptyAsNull);
         }
         delay = retryAfter ?? backoff(retriesTaken);
         this.#log(
@@ -279,12 +281,18 @@ export abstract class APIClient {
   }
 }
 
-function parse<T>(request: FailedRequest, response: Response, text: string): T {
+function parse<T>(
+  request: FailedRequest,
+  response: Response,
+  text: string,
+  emptyAsNull = false,
+): T {
   if (!response.ok) {
     throw statusError(request, response, text);
   }
+  let data: unknown;
   try {
-    return JSON.parse(text) as T;
+    data = JSON.parse(text);
   } catch (cause) {
     throw new APIResponseValidationError(
       'MAWAQIT did not answer with JSON.',
@@ -296,6 +304,7 @@ function parse<T>(request: FailedRequest, response: Response, text: string): T {
       },
     );
   }
+  return (emptyAsNull && Array.isArray(data) && data.length === 0 ? null : data) as T;
 }
 
 /** Return the delay asked by a `Retry-After` header in milliseconds, if it has a valid one. */

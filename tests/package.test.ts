@@ -26,6 +26,7 @@ test('the public API', () => {
     'DEFAULT_BASE_URL',
     'DEFAULT_MAX_RETRIES',
     'DEFAULT_TIMEOUT',
+    'Hadiths',
     'InternalServerError',
     'Mawaqit',
     'MawaqitError',
