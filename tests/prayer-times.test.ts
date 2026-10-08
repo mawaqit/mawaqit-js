@@ -408,6 +408,10 @@ describe('nextPrayer', () => {
       name: 'jumua',
       at: '2026-01-09T12:50:00.000Z',
     });
+    // On a Friday after the last Jumu'a, the one of the next Friday.
+    expect(next('2026-01-02T14:00:00Z', { prayer: 'jumua' })).toMatchObject({
+      at: '2026-01-09T12:50:00.000Z',
+    });
   });
 
   test('one prayer: its iqama, and an Isha after midnight', () => {
