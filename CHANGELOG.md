@@ -4,6 +4,13 @@ All notable changes to this library. It follows [Semantic Versioning](https://se
 
 ## Unreleased
 
+## 1.2.1 - 2026-10-14
+
+### Fixed
+
+- `MosqueConfig.backgroundUrl` is optional: the API leaves it out when the screens of the mosque
+  have a background color.
+
 ## 1.2.0 - 2026-10-08
 
 ### Added

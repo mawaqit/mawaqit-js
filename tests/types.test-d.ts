@@ -8,6 +8,7 @@ import {
   type InternalServerError,
   Mawaqit,
   type Mosque,
+  type MosqueConfig,
   type NotFoundError,
   type PrayerTimes,
   type RateLimitError,
@@ -64,6 +65,10 @@ test('responses', () => {
 test('nullable and optional fields', () => {
   expectTypeOf<Mosque['phone']>().toEqualTypeOf<string | null>();
   expectTypeOf<Mosque>().toHaveProperty('proximity').toEqualTypeOf<number | undefined>();
+  // Absent for a background color.
+  expectTypeOf<MosqueConfig>()
+    .toHaveProperty('backgroundUrl')
+    .toEqualTypeOf<string | null | undefined>();
   const calendar = [] as PrayerTimes['calendar'];
   // Days and months may be missing.
   expectTypeOf(calendar[0]?.['1']).toEqualTypeOf<string[] | undefined>();
