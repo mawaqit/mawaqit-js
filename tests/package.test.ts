@@ -39,6 +39,7 @@ test('the public API', () => {
   expect(Object.keys(hijri).sort()).toEqual([
     'HijriDate',
     'HijriMonth',
+    'eventName',
     'fromGregorian',
     'kuwaiti',
     'monthName',

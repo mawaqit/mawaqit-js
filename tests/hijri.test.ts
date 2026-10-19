@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import {
+  eventName,
   fromGregorian,
   HijriDate,
   HijriMonth,
@@ -186,6 +187,21 @@ describe('upcoming events', () => {
       '1 Shawwal 1447',
       1,
     ]);
+  });
+
+  test.each([
+    ['fr-FR', 'eid_al_adha', 'Aïd al-Adha'],
+    ['ar', 'arafah', 'يوم عرفة'],
+    ['de', 'eid_al_fitr', 'Ramadanfest'],
+    ['tr_TR', 'eid_al_adha', 'Kurban Bayramı'],
+    ['es', 'arafah', 'Day of Arafah'],
+  ] as const)('names in %s', (language, event, name) => {
+    expect(eventName(event, language)).toBe(name);
+  });
+
+  test.each(['ar', 'de', 'en', 'fr', 'tr'])('six names in %s', (language) => {
+    const events = upcomingEvents(settings(), 'UTC').map(({ event }) => eventName(event, language));
+    expect(new Set(events).size).toBe(6);
   });
 
   test('a 30th forced on another day leaves the next days to the algorithm', () => {

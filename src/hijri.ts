@@ -144,8 +144,13 @@ const MONTH_NAMES = new Map<string, readonly string[]>([
  * @returns The name of the month in this language.
  */
 export function monthName(month: HijriMonth, language = 'en'): string {
-  const names = MONTH_NAMES.get(language.replace(/[-_].*/s, '').toLowerCase());
+  const names = MONTH_NAMES.get(languageOf(language));
   return (names ?? ENGLISH_MONTH_NAMES)[month - 1] as string;
+}
+
+/** `fr` for `fr`, `fr-FR` or `fr_FR`. */
+function languageOf(tag: string): string {
+  return tag.replace(/[-_].*/s, '').toLowerCase();
 }
 
 /** A date of the Hijri calendar. */
@@ -271,6 +276,76 @@ const EVENTS: readonly (readonly [IslamicEvent, HijriMonth, number])[] = [
   ['arafah', HijriMonth.DHU_AL_HIJJAH, 9],
   ['eid_al_adha', HijriMonth.DHU_AL_HIJJAH, 10],
 ];
+
+const ENGLISH_EVENT_NAMES: Readonly<Record<IslamicEvent, string>> = {
+  islamic_new_year: 'Islamic New Year',
+  ashura: 'Ashura',
+  ramadan: 'Ramadan',
+  eid_al_fitr: 'Eid al-Fitr',
+  arafah: 'Day of Arafah',
+  eid_al_adha: 'Eid al-Adha',
+};
+
+// The usual names in each language: the MAWAQIT website names no event yet.
+const EVENT_NAMES = new Map<string, Readonly<Record<IslamicEvent, string>>>([
+  [
+    'ar',
+    {
+      islamic_new_year: 'رأس السنة الهجرية',
+      ashura: 'عاشوراء',
+      ramadan: 'رمضان',
+      eid_al_fitr: 'عيد الفطر',
+      arafah: 'يوم عرفة',
+      eid_al_adha: 'عيد الأضحى',
+    },
+  ],
+  [
+    'de',
+    {
+      islamic_new_year: 'Islamisches Neujahr',
+      ashura: 'Aschura',
+      ramadan: 'Ramadan',
+      eid_al_fitr: 'Ramadanfest',
+      arafah: 'Tag von Arafat',
+      eid_al_adha: 'Opferfest',
+    },
+  ],
+  ['en', ENGLISH_EVENT_NAMES],
+  [
+    'fr',
+    {
+      islamic_new_year: 'Nouvel An hégirien',
+      ashura: 'Achoura',
+      ramadan: 'Ramadan',
+      eid_al_fitr: 'Aïd al-Fitr',
+      arafah: "Jour d'Arafat",
+      eid_al_adha: 'Aïd al-Adha',
+    },
+  ],
+  [
+    'tr',
+    {
+      islamic_new_year: 'Hicri Yılbaşı',
+      ashura: 'Aşure Günü',
+      ramadan: 'Ramazan',
+      eid_al_fitr: 'Ramazan Bayramı',
+      arafah: 'Arefe Günü',
+      eid_al_adha: 'Kurban Bayramı',
+    },
+  ],
+]);
+
+/**
+ * Return the name of an Islamic event, like `Eid al-Fitr`.
+ *
+ * @param event - The event.
+ * @param language - A language, like `fr`, or a language tag, like `fr-FR`. Arabic, English,
+ *   French, German and Turkish have their names; the other languages get the English name.
+ * @returns The name of the event in this language.
+ */
+export function eventName(event: IslamicEvent, language = 'en'): string {
+  return (EVENT_NAMES.get(languageOf(language)) ?? ENGLISH_EVENT_NAMES)[event];
+}
 
 /** The next day of an Islamic event. */
 export interface UpcomingEvent {
