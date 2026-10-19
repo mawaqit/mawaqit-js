@@ -7,6 +7,7 @@ import {
   kuwaiti,
   monthName,
   today,
+  upcomingEvents,
 } from '@mawaqit/sdk/hijri';
 import { describe, expect, test, vi } from 'vitest';
 import { example } from './helpers.ts';
@@ -134,6 +135,69 @@ test.each([
   }
 });
 
+test.each([-3, 3])('adjustment %i, which mosques cannot choose, counts as 0', (adjustment) => {
+  expect(fromGregorian('2026-02-17', settings(adjustment))).toEqual(
+    new HijriDate(1447, HijriMonth.RAMADAN, 1),
+  );
+});
+
+describe('upcoming events', () => {
+  function eventsAt(now: string, hijriSettings: HijriSettingsLike): unknown[] {
+    vi.setSystemTime(now);
+    try {
+      return upcomingEvents(hijriSettings, 'Europe/Paris').map(
+        ({ event, date, hijriDate, daysUntil }) => [event, date, `${hijriDate}`, daysUntil],
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  }
+
+  test('the next day of each event, sorted by date', () => {
+    expect(eventsAt('2026-10-19T10:00Z', settings())).toEqual([
+      ['ramadan', '2027-02-07', '1 Ramadan 1448', 111],
+      ['eid_al_fitr', '2027-03-09', '1 Shawwal 1448', 141],
+      ['arafah', '2027-05-15', '9 Dhu al-Hijjah 1448', 208],
+      ['eid_al_adha', '2027-05-16', '10 Dhu al-Hijjah 1448', 209],
+      ['islamic_new_year', '2027-06-05', '1 Muharram 1449', 229],
+      ['ashura', '2027-06-14', '10 Muharram 1449', 238],
+    ]);
+  });
+
+  test('an event of today', () => {
+    vi.setSystemTime('2026-02-17T10:00Z');
+    try {
+      expect(upcomingEvents(settings(), 'Europe/Paris')[0]).toEqual({
+        event: 'ramadan',
+        date: '2026-02-17',
+        hijriDate: new HijriDate(1447, HijriMonth.RAMADAN, 1),
+        daysUntil: 0,
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  // On the eve of Eid, the mosque shows 30 Ramadan where the algorithm says 1 Shawwal.
+  test('a 30th forced on the first day of a month starts the month tomorrow', () => {
+    expect(eventsAt('2026-03-19T10:00Z', settings(0, true))[0]).toEqual([
+      'eid_al_fitr',
+      '2026-03-20',
+      '1 Shawwal 1447',
+      1,
+    ]);
+  });
+
+  test('a 30th forced on another day leaves the next days to the algorithm', () => {
+    expect(eventsAt('2026-03-17T10:00Z', settings(0, true))[0]).toEqual([
+      'eid_al_fitr',
+      '2026-03-19',
+      '1 Shawwal 1447',
+      2,
+    ]);
+  });
+});
+
 test('today in an unknown time zone', () => {
   expect(() => today(settings(), 'Europe/Atlantis')).toThrow(RangeError);
 });
@@ -151,6 +215,22 @@ describe('months', () => {
     expect(HijriMonth.RAMADAN).toBe(9);
     expect(monthName(HijriMonth.RAMADAN)).toBe('Ramadan');
     expect(monthName(HijriMonth.DHU_AL_QIDAH)).toBe("Dhu al-Qi'dah");
+  });
+
+  test.each([
+    ['fr', 'Chaabane'],
+    ['fr-FR', 'Chaabane'],
+    ['AR', 'شعبان'],
+    ['de', 'Schaʿbān'],
+    ['tr_TR', 'Şaban'],
+    ['es', "Sha'ban"],
+  ])('names in %s', (language, name) => {
+    expect(monthName(HijriMonth.SHABAN, language)).toBe(name);
+  });
+
+  test.each(['ar', 'de', 'en', 'fr', 'tr'])('twelve names in %s', (language) => {
+    const names = Object.values(HijriMonth).map((month) => monthName(month, language));
+    expect(new Set(names).size).toBe(12);
   });
 
   test('keys are the names of the MAWAQIT apps, which integrations use as states', () => {

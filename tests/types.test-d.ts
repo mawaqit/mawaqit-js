@@ -13,7 +13,14 @@ import {
   type PrayerTimes,
   type RateLimitError,
 } from '@mawaqit/sdk';
-import { HijriMonth, type HijriSettingsLike, today } from '@mawaqit/sdk/hijri';
+import {
+  HijriMonth,
+  type HijriSettingsLike,
+  type IslamicEvent,
+  today,
+  type UpcomingEvent,
+  upcomingEvents,
+} from '@mawaqit/sdk/hijri';
 import {
   nextPrayer,
   type Prayer,
@@ -96,6 +103,10 @@ test('Hijri', () => {
   expectTypeOf<HijriMonth>().toEqualTypeOf<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>();
   expectTypeOf<PrayerTimes>().toExtend<HijriSettingsLike>();
   expectTypeOf(today).parameter(1).toEqualTypeOf<string>();
+  expectTypeOf(upcomingEvents).returns.toEqualTypeOf<UpcomingEvent[]>();
+  expectTypeOf<UpcomingEvent['event']>().toEqualTypeOf<IslamicEvent>();
+  expectTypeOf<'ramadan'>().toExtend<IslamicEvent>();
+  expectTypeOf<'mawlid'>().not.toExtend<IslamicEvent>();
 });
 
 test('prayer times', () => {

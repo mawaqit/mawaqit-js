@@ -131,6 +131,17 @@ mosques change their settings after the moon sighting. `fromGregorian('2026-10-0
 gives the date of another day, from an ISO date or a `{ year, month, day }` object like a
 `Temporal.PlainDate`.
 
+`monthName(date.month, 'fr')` names the month in Arabic, English, French, German or Turkish, and
+in English for the other languages. `upcomingEvents()` gives the next day of the Islamic new
+year, Ashura, Ramadan, Eid al-Fitr, Arafah and Eid al-Adha, an estimate after today:
+
+```ts
+import { upcomingEvents } from '@mawaqit/sdk/hijri';
+
+const ramadan = upcomingEvents(settings, 'Europe/Paris').find(({ event }) => event === 'ramadan');
+console.log(ramadan?.date, ramadan?.daysUntil); // 2027-02-07 111
+```
+
 ### Errors
 
 Every error extends `MawaqitError`:
