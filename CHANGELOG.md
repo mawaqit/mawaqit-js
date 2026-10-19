@@ -4,6 +4,14 @@ All notable changes to this library. It follows [Semantic Versioning](https://se
 
 ## Unreleased
 
+## 1.4.0 - 2026-10-19
+
+### Added
+
+- `eventName(event, language)`: the name of an Islamic event in Arabic, English, French, German or
+  Turkish, like `Aïd al-Adha` or `Kurban Bayramı`, from a language or a language tag like `fr-FR`.
+  Other languages get the English name.
+
 ## 1.3.0 - 2026-10-19
 
 ### Added

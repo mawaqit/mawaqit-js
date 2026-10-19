@@ -133,7 +133,8 @@ gives the date of another day, from an ISO date or a `{ year, month, day }` obje
 
 `monthName(date.month, 'fr')` names the month in Arabic, English, French, German or Turkish, and
 in English for the other languages. `upcomingEvents()` gives the next day of the Islamic new
-year, Ashura, Ramadan, Eid al-Fitr, Arafah and Eid al-Adha, an estimate after today:
+year, Ashura, Ramadan, Eid al-Fitr, Arafah and Eid al-Adha, an estimate after today, and
+`eventName(event, 'fr')` names them in the same languages:
 
 ```ts
 import { upcomingEvents } from '@mawaqit/sdk/hijri';

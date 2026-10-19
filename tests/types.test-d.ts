@@ -14,6 +14,7 @@ import {
   type RateLimitError,
 } from '@mawaqit/sdk';
 import {
+  eventName,
   HijriMonth,
   type HijriSettingsLike,
   type IslamicEvent,
@@ -107,6 +108,7 @@ test('Hijri', () => {
   expectTypeOf<UpcomingEvent['event']>().toEqualTypeOf<IslamicEvent>();
   expectTypeOf<'ramadan'>().toExtend<IslamicEvent>();
   expectTypeOf<'mawlid'>().not.toExtend<IslamicEvent>();
+  expectTypeOf(eventName).parameter(0).toEqualTypeOf<IslamicEvent>();
 });
 
 test('prayer times', () => {
