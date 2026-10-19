@@ -14,6 +14,11 @@ All notable changes to this library. It follows [Semantic Versioning](https://se
 - `upcomingEvents(settings, timeZone)`: the next day of the Islamic new year, Ashura, Ramadan,
   Eid al-Fitr, Arafah and Eid al-Adha at a mosque, with its Hijri date and the days until it.
 
+### Changed
+
+- The docs of `client.mosques.hijriSettings()` no longer say that `prayerTimes()` lags behind:
+  the API refreshes their cache together since 30 September 2026 (mawaqit/api-spec v0.5.3).
+
 ### Fixed
 
 - An adjustment outside -2 to 2 counts as 0. The API returns -3 for a French mosque that has not
