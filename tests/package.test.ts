@@ -43,6 +43,7 @@ test('the public API', () => {
     'kuwaiti',
     'monthName',
     'today',
+    'upcomingEvents',
   ]);
   expect(Object.keys(prayerTimes).sort()).toEqual(['nextPrayer', 'night', 'prayerDay']);
 });

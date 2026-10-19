@@ -4,6 +4,21 @@ All notable changes to this library. It follows [Semantic Versioning](https://se
 
 ## Unreleased
 
+## 1.3.0 - 2026-10-19
+
+### Added
+
+- `monthName(month, language)`: the name of a Hijri month in Arabic, French, German or Turkish,
+  as on the MAWAQIT website, from a language or a language tag like `fr-FR`. Other languages
+  get the English name, as before.
+- `upcomingEvents(settings, timeZone)`: the next day of the Islamic new year, Ashura, Ramadan,
+  Eid al-Fitr, Arafah and Eid al-Adha at a mosque, with its Hijri date and the days until it.
+
+### Fixed
+
+- An adjustment outside -2 to 2 counts as 0. The API returns -3 for a French mosque that has not
+  chosen its adjustment yet, so its Hijri date was 3 days early.
+
 ## 1.2.1 - 2026-10-14
 
 ### Fixed
