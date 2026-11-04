@@ -50,16 +50,16 @@ if (mosque) {
 }
 ```
 
-| Method | Returns |
-| --- | --- |
-| `client.mosques.search({ word })` or `({ lat, lon })` | A `Mosque[]` |
-| `client.mosques.get(mosqueId)` | The `MosqueSummary` of a mosque or a home, with its UUID |
-| `client.mosques.prayerTimes(uuid)` | The `PrayerTimes` of the year, with iqama |
-| `client.mosques.hijriSettings(uuid)` | The `HijriSettings` of the mosque |
-| `client.mosques.config(uuid)` | The `MosqueConfig`: the settings of the mosque screens |
-| `client.mosques.flashMessage(uuid)` | The `FlashMessage` of the mosque screens, or `null` |
-| `client.hadiths.random({ lang })` | A random `Hadith` in a language, or `null` |
-| `client.auth.login({ email, password })` | The `Account`, with its API token |
+| Method                                                | Returns                                                  |
+| ----------------------------------------------------- | -------------------------------------------------------- |
+| `client.mosques.search({ word })` or `({ lat, lon })` | A `Mosque[]`                                             |
+| `client.mosques.get(mosqueId)`                        | The `MosqueSummary` of a mosque or a home, with its UUID |
+| `client.mosques.prayerTimes(uuid)`                    | The `PrayerTimes` of the year, with iqama                |
+| `client.mosques.hijriSettings(uuid)`                  | The `HijriSettings` of the mosque                        |
+| `client.mosques.config(uuid)`                         | The `MosqueConfig`: the settings of the mosque screens   |
+| `client.mosques.flashMessage(uuid)`                   | The `FlashMessage` of the mosque screens, or `null`      |
+| `client.hadiths.random({ lang })`                     | A random `Hadith` in a language, or `null`               |
+| `client.auth.login({ email, password })`              | The `Account`, with its API token                        |
 
 Responses are the JSON of the API, typed: fields keep the camelCase names of the API, like
 `mosque.womenSpace`. A field that can be `null` is typed `| null`, and one that can be missing is
@@ -147,15 +147,15 @@ console.log(ramadan?.date, ramadan?.daysUntil); // 2027-02-07 111
 
 Every error extends `MawaqitError`:
 
-| Error | When |
-| --- | --- |
-| `AuthenticationError` | The token is wrong (HTTP 401) |
-| `PermissionDeniedError` | The account used all its API calls, or the request was blocked (HTTP 403) |
-| `NotFoundError` | No mosque has this UUID (HTTP 404) |
-| `RateLimitError`, `BadRequestError`, `InternalServerError` | HTTP 429, 400, 500 and above |
-| `APIStatusError` | Any other error status, and base class of the ones above |
-| `APIConnectionError`, `APITimeoutError` | MAWAQIT could not be reached, or did not answer in time |
-| `APIResponseValidationError` | The response is not JSON |
+| Error                                                      | When                                                                      |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `AuthenticationError`                                      | The token is wrong (HTTP 401)                                             |
+| `PermissionDeniedError`                                    | The account used all its API calls, or the request was blocked (HTTP 403) |
+| `NotFoundError`                                            | No mosque has this UUID (HTTP 404)                                        |
+| `RateLimitError`, `BadRequestError`, `InternalServerError` | HTTP 429, 400, 500 and above                                              |
+| `APIStatusError`                                           | Any other error status, and base class of the ones above                  |
+| `APIConnectionError`, `APITimeoutError`                    | MAWAQIT could not be reached, or did not answer in time                   |
+| `APIResponseValidationError`                               | The response is not JSON                                                  |
 
 `APIError`, their base class, has the failed `request` and the response `body`. `APIStatusError`
 adds the `status` and `headers` of the response: `status` is typed `404` on a `NotFoundError`.
