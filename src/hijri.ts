@@ -23,6 +23,7 @@
  */
 
 import { dayIn, type GregorianDay, isoDate, unixDay } from './dates.ts';
+import { languageOf } from './language.ts';
 import type { HijriSettings } from './types.ts';
 
 export type { GregorianDay } from './dates.ts';
@@ -146,11 +147,6 @@ const MONTH_NAMES = new Map<string, readonly string[]>([
 export function monthName(month: HijriMonth, language = 'en'): string {
   const names = MONTH_NAMES.get(languageOf(language));
   return (names ?? ENGLISH_MONTH_NAMES)[month - 1] as string;
-}
-
-/** `fr` for `fr`, `fr-FR` or `fr_FR`. */
-function languageOf(tag: string): string {
-  return tag.replace(/[-_].*/s, '').toLowerCase();
 }
 
 /** A date of the Hijri calendar. */

@@ -46,5 +46,14 @@ test('the public API', () => {
     'today',
     'upcomingEvents',
   ]);
-  expect(Object.keys(prayerTimes).sort()).toEqual(['nextPrayer', 'night', 'prayerDay']);
+  expect(Object.keys(prayerTimes).sort()).toEqual([
+    'CALCULATION_METHODS',
+    'calculatePrayerTimes',
+    'calculationMethodName',
+    'defaultCalculationMethod',
+    'defaultCalculationSettings',
+    'nextPrayer',
+    'night',
+    'prayerDay',
+  ]);
 });

@@ -1,3 +1,5 @@
 [codespell]
 # Real API responses, in French among others.
 skip = ./node_modules,./dist,./coverage,./tests/examples,./tests/data,./pnpm-lock.yaml
+# French, in the names of the calculation methods.
+ignore-words-list = affaires

@@ -23,6 +23,14 @@ import {
   upcomingEvents,
 } from '@mawaqit/sdk/hijri';
 import {
+  CALCULATION_METHODS,
+  type CalculatedPrayerTimes,
+  type CalculationMethod,
+  type CalculationSettings,
+  calculatePrayerTimes,
+  calculationMethodName,
+  defaultCalculationMethod,
+  defaultCalculationSettings,
   nextPrayer,
   type Prayer,
   type PrayerName,
@@ -132,4 +140,53 @@ test('prayer times', () => {
   prayerDay(prayerTimes, { year: 2026, month: 10, day: 5 });
   // @ts-expect-error A day, not an instant.
   prayerDay(prayerTimes, new Date());
+});
+
+test('calculated prayer times', () => {
+  const position = { latitude: 48.85, longitude: 2.35, timeZone: 'Europe/Paris' };
+  const times = calculatePrayerTimes(position, defaultCalculationSettings('FR'));
+  expectTypeOf(times).toEqualTypeOf<CalculatedPrayerTimes>();
+  // Read like the times of a mosque.
+  expectTypeOf<CalculatedPrayerTimes>().toExtend<PrayerTimesLike>();
+  expectTypeOf<CalculatedPrayerTimes>().toExtend<HijriSettingsLike>();
+  expectTypeOf(prayerDay(times)?.fajr).toEqualTypeOf<Prayer | null | undefined>();
+  today(times, times.timezone);
+
+  calculatePrayerTimes(position, { ...defaultCalculationSettings('FR'), madhab: 'hanafi' });
+  calculatePrayerTimes(
+    position,
+    {
+      method: 'custom',
+      fajrAngle: 15,
+      ishaAngle: 14,
+      madhab: 'shafi',
+      highLatitudeRule: 'twilight_angle',
+      adjustments: { shuruq: -2, isha: 3 },
+    },
+    { year: 2027, hijriAdjustment: 1, jumuaAtDhuhr: true, imsakMinutesBeforeFajr: null },
+  );
+  const settings = defaultCalculationSettings();
+  // @ts-expect-error Methods have ids, like `muslim_world_league`.
+  calculatePrayerTimes(position, { ...settings, method: 'MWL' });
+  // @ts-expect-error Shuruq, not sunrise.
+  calculatePrayerTimes(position, { ...settings, adjustments: { sunrise: 2 } });
+  // @ts-expect-error The rule is required.
+  calculatePrayerTimes(position, { method: 'angle_15', madhab: 'shafi' });
+  // @ts-expect-error The time zone is required.
+  calculatePrayerTimes({ latitude: 48.85, longitude: 2.35 }, settings);
+});
+
+test('calculation methods', () => {
+  expectTypeOf(defaultCalculationMethod('FR')).toEqualTypeOf<
+    Exclude<CalculationMethod, 'custom'>
+  >();
+  expectTypeOf(defaultCalculationSettings('FR')).toEqualTypeOf<CalculationSettings>();
+  expectTypeOf(CALCULATION_METHODS[defaultCalculationMethod()].ishaAngle).toEqualTypeOf<
+    number | null
+  >();
+  // @ts-expect-error Custom angles are in the settings.
+  CALCULATION_METHODS.custom;
+  expectTypeOf(calculationMethodName).parameter(0).toEqualTypeOf<CalculationMethod>();
+  // @ts-expect-error An id, not a name.
+  calculationMethodName('Muslim World League');
 });
