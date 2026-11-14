@@ -2,7 +2,11 @@
 
 import { HijriDate, today } from '../dist/hijri.js';
 import { Mawaqit, NotFoundError } from '../dist/index.js';
-import { nextPrayer } from '../dist/prayer-times.js';
+import {
+  calculatePrayerTimes,
+  defaultCalculationSettings,
+  nextPrayer,
+} from '../dist/prayer-times.js';
 
 const fetch = async () => Response.json({ message: 'No mosque.' }, { status: 404 });
 const client = new Mawaqit({ fetch, token: 'token' });
@@ -23,4 +27,11 @@ const next = nextPrayer({ timezone: 'Asia/Riyadh', calendar, iqamaCalendar: [] }
 if (!next?.time) {
   throw new Error(`Unexpected next prayer: ${next}`);
 }
-console.log(`OK: ${date}, ${next.name} at ${next.time}`);
+const position = { latitude: 21.42, longitude: 39.83, timeZone: 'Asia/Riyadh' };
+const times = calculatePrayerTimes(position, defaultCalculationSettings('SA'), { year: 2026 });
+if (times.calendar[0]?.['1']?.join() !== '05:37,06:59,12:25,15:29,17:50,19:20') {
+  throw new Error(`Unexpected calculated times: ${times.calendar[0]?.['1']}`);
+}
+console.log(
+  `OK: ${date}, ${next.name} at ${next.time}, Fajr in Makkah at ${times.calendar[0][1][0]}`,
+);

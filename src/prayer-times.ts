@@ -19,6 +19,17 @@
  *
  * Times entered by hand by the mosque can be invalid: such a prayer is `null`, rather than wrong.
  *
+ * Without a mosque, `calculatePrayerTimes()` calculates the times of a year at a position, offline,
+ * in the same shape: these functions read them the same way.
+ *
+ * ```ts
+ * import { calculatePrayerTimes, defaultCalculationSettings } from '@mawaqit/sdk/prayer-times';
+ *
+ * const position = { latitude: 48.85, longitude: 2.35, timeZone: 'Europe/Paris' };
+ * const times = calculatePrayerTimes(position, defaultCalculationSettings('FR'));
+ * console.log(prayerDay(times)?.fajr?.time); // 06:42 on 26 November
+ * ```
+ *
  * @module
  */
 
@@ -36,6 +47,20 @@ import {
 } from './dates.ts';
 import type { PrayerTimes } from './types.ts';
 
+export {
+  type CalculatedPrayerTimes,
+  type CalculationOptions,
+  type CalculationPosition,
+  type CalculationSettings,
+  calculatePrayerTimes,
+} from './calculation/calculate.ts';
+export {
+  CALCULATION_METHODS,
+  type CalculationMethod,
+  calculationMethodName,
+  defaultCalculationMethod,
+  defaultCalculationSettings,
+} from './calculation/methods.ts';
 export type { GregorianDay } from './dates.ts';
 
 /** The name of a prayer, or of Shuruq and Imsak. */

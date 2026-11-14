@@ -18,6 +18,7 @@ export type GregorianDay =
 
 export const MINUTE = 60_000;
 const DAY = 86_400_000;
+const MINUTES_PER_DAY = 1440;
 
 /**
  * Return the number of days between 1 January 1970 and a Gregorian day.
@@ -73,6 +74,13 @@ export function parseTime(time: string | null | undefined): number | null {
 export function formatTime(instant: number, timeZone: string): string {
   const { hour, minute } = wallClock(instant, timeZone);
   return `${pad(hour)}:${pad(minute)}`;
+}
+
+/** Like {@link formatTime}, at a known offset of the time zone, in milliseconds: without `Intl`. */
+export function formatTimeWithOffset(instant: number, offset: number): string {
+  const minutes = Math.floor((instant + offset) / MINUTE);
+  const ofDay = ((minutes % MINUTES_PER_DAY) + MINUTES_PER_DAY) % MINUTES_PER_DAY;
+  return `${pad(Math.floor(ofDay / 60))}:${pad(ofDay % 60)}`;
 }
 
 /**
@@ -132,7 +140,7 @@ function wallClock(
 }
 
 /** Return the offset of a time zone from UTC at an instant, in milliseconds. */
-function offsetAt(instant: number, timeZone: string): number {
+export function offsetAt(instant: number, timeZone: string): number {
   const { year, month, day, hour, minute, second } = wallClock(instant, timeZone);
   const local = utcDate(year, month, day).getTime() + ((hour * 60 + minute) * 60 + second) * 1000;
   return local - Math.floor(instant / 1000) * 1000;
