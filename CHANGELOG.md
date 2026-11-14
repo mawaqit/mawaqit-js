@@ -2,7 +2,7 @@
 
 All notable changes to this library. It follows [Semantic Versioning](https://semver.org).
 
-## Unreleased
+## 1.5.0 - 2026-11-14
 
 ### Added
 
