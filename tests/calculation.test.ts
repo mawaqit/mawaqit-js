@@ -633,20 +633,22 @@ describe('methods', () => {
   });
 });
 
-// The times of the MAWAQIT mobile app, recorded with the same settings: see the README there.
+// The times of the MAWAQIT mobile app with the same settings: see the README there.
 describe('the times of the MAWAQIT app', () => {
   const directory = new URL('data/calculation/', import.meta.url);
   const files = readdirSync(directory).filter((name) => name.endsWith('.json'));
+  const prayers = ['fajr', 'shuruq', 'dhuhr', 'asr', 'maghrib', 'isha'];
 
-  if (files.length === 0) {
-    test.todo('no reference times recorded yet');
-  }
+  test('are recorded', () => {
+    expect(files.length).toBeGreaterThan(0);
+  });
 
   test.each(files)('%s', (name) => {
     const reference = JSON.parse(readFileSync(new URL(name, directory), 'utf8')) as {
       position: CalculationPosition;
       settings: CalculationSettings;
       options?: CalculationOptions;
+      differences?: Record<string, Record<string, string>>;
       days: Record<string, string[]>;
     };
     const years = new Map<number, CalculatedPrayerTimes>();
@@ -664,6 +666,10 @@ describe('the times of the MAWAQIT app', () => {
       const [fajr, shuruq, dhuhr = '', ...rest] = recorded;
       const later = new Date(Date.parse(`1970-01-01T${dhuhr}:00Z`) + 60_000);
       const expected = [fajr, shuruq, later.toISOString().slice(11, 16), ...rest];
+      // The minutes where this library keeps the time of adhan-js: see the README.
+      for (const [prayer, time] of Object.entries(reference.differences?.[date] ?? {})) {
+        expected[prayers.indexOf(prayer)] = time;
+      }
       expect(row(times, date), date).toEqual(expected);
     }
   });
