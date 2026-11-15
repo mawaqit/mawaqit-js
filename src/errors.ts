@@ -115,6 +115,16 @@ export class AuthenticationError extends APIStatusError<401> {
   override readonly name: string = 'AuthenticationError';
 }
 
+/**
+ * The account is disabled, as until its email address is confirmed (HTTP 401).
+ *
+ * Logging in still returns the API token of a disabled account, but the API refuses it until the
+ * account is enabled.
+ */
+export class AccountDisabledError extends AuthenticationError {
+  override readonly name: string = 'AccountDisabledError';
+}
+
 /** The account used all its API calls, or the request was blocked (HTTP 403). */
 export class PermissionDeniedError extends APIStatusError<403> {
   override readonly name: string = 'PermissionDeniedError';
@@ -142,6 +152,8 @@ const STATUS_ERRORS: Readonly<Record<number, typeof APIStatusError<number>>> = {
   404: NotFoundError,
   429: RateLimitError,
 };
+
+const ACCOUNT_DISABLED = 'form.error.account_disable';
 
 // HTTP/2 responses have no reason phrase.
 const REASONS: Readonly<Record<number, string>> = {
@@ -171,6 +183,9 @@ export function statusError(
   }
   const message =
     readMessage(body) ?? (response.statusText || REASONS[response.status] || 'Unknown error');
+  if (response.status === 401 && message === ACCOUNT_DISABLED) {
+    return new AccountDisabledError(message, request, response, body);
+  }
   const ErrorClass =
     response.status >= 500
       ? InternalServerError

@@ -2,6 +2,13 @@
 
 All notable changes to this library. It follows [Semantic Versioning](https://semver.org).
 
+## 1.6.0 - 2026-11-14
+
+### Added
+
+- `AccountDisabledError`, a subclass of `AuthenticationError`: the API refuses the token of a
+  disabled account, as until its email address is confirmed, although logging in returns it.
+
 ## 1.5.0 - 2026-11-14
 
 ### Added

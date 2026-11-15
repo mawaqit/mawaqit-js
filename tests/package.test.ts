@@ -20,6 +20,7 @@ test('the public API', () => {
     'APIResponseValidationError',
     'APIStatusError',
     'APITimeoutError',
+    'AccountDisabledError',
     'Auth',
     'AuthenticationError',
     'BadRequestError',
