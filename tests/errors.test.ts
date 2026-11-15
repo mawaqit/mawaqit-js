@@ -1,4 +1,5 @@
 import {
+  AccountDisabledError,
   APIConnectionError,
   APIError,
   APIResponseValidationError,
@@ -57,6 +58,20 @@ describe('status errors', () => {
     expect(new URL(statusError.request.url).pathname).toBe(PRAYER_TIMES);
   });
 
+  test('of a disabled account', async () => {
+    const body = { message: 'form.error.account_disable' };
+    const { client } = mockAPI([json(body, { status: 401 })]);
+
+    const error = await caught(client.mosques.prayerTimes(UUID));
+
+    expect(error).toBeInstanceOf(AccountDisabledError);
+    const disabled = error as AccountDisabledError;
+    expect(disabled.name).toBe('AccountDisabledError');
+    expect(disabled.message).toBe('form.error.account_disable (HTTP 401)');
+    expect(disabled.status).toBe(401);
+    expect(disabled.body).toEqual(body);
+  });
+
   test('with an HTML page', async () => {
     const { client } = mockAPI([new Response('<p>error401</p>', { status: 401 })]);
 
@@ -102,6 +117,7 @@ test('hierarchy', () => {
   ]) {
     expect(ErrorClass.prototype).toBeInstanceOf(APIStatusError);
   }
+  expect(AccountDisabledError.prototype).toBeInstanceOf(AuthenticationError);
   expect(APITimeoutError.prototype).toBeInstanceOf(APIConnectionError);
   for (const ErrorClass of [APIStatusError, APIConnectionError, APIResponseValidationError]) {
     expect(ErrorClass.prototype).toBeInstanceOf(APIError);

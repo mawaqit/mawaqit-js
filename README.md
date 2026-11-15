@@ -193,6 +193,7 @@ Every error extends `MawaqitError`:
 | Error                                                      | When                                                                      |
 | ---------------------------------------------------------- | ------------------------------------------------------------------------- |
 | `AuthenticationError`                                      | The token is wrong (HTTP 401)                                             |
+| `AccountDisabledError`                                     | The account is disabled, as until its email is confirmed (HTTP 401)       |
 | `PermissionDeniedError`                                    | The account used all its API calls, or the request was blocked (HTTP 403) |
 | `NotFoundError`                                            | No mosque has this UUID (HTTP 404)                                        |
 | `RateLimitError`, `BadRequestError`, `InternalServerError` | HTTP 429, 400, 500 and above                                              |
@@ -204,12 +205,14 @@ Every error extends `MawaqitError`:
 adds the `status` and `headers` of the response: `status` is typed `404` on a `NotFoundError`.
 
 ```ts
-import { AuthenticationError, MawaqitError } from '@mawaqit/sdk';
+import { AccountDisabledError, AuthenticationError, MawaqitError } from '@mawaqit/sdk';
 
 try {
   const prayerTimes = await client.mosques.prayerTimes(uuid);
 } catch (error) {
-  if (error instanceof AuthenticationError) {
+  if (error instanceof AccountDisabledError) {
+    // Ask to confirm the email address of the account.
+  } else if (error instanceof AuthenticationError) {
     // Ask for a new token.
   } else if (error instanceof MawaqitError) {
     console.error(error.message); // Invalid token. (HTTP 401)

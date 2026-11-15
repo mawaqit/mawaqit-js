@@ -2,7 +2,9 @@
 
 import {
   type Account,
+  type AccountDisabledError,
   type APIStatusError,
+  type AuthenticationError,
   type FlashMessage,
   type Hadith,
   type InternalServerError,
@@ -105,6 +107,8 @@ test('the status of the errors', () => {
   expectTypeOf<RateLimitError['status']>().toEqualTypeOf<429>();
   expectTypeOf<InternalServerError['status']>().toEqualTypeOf<number>();
   expectTypeOf<NotFoundError>().toExtend<APIStatusError>();
+  expectTypeOf<AccountDisabledError['status']>().toEqualTypeOf<401>();
+  expectTypeOf<AccountDisabledError>().toExtend<AuthenticationError>();
 });
 
 test('Hijri', () => {

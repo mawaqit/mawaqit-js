@@ -29,6 +29,7 @@ export {
   type RequestOptions,
 } from './core.ts';
 export {
+  AccountDisabledError,
   APIConnectionError,
   APIError,
   APIResponseValidationError,
