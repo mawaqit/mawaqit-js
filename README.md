@@ -205,12 +205,14 @@ Every error extends `MawaqitError`:
 adds the `status` and `headers` of the response: `status` is typed `404` on a `NotFoundError`.
 
 ```ts
-import { AuthenticationError, MawaqitError } from '@mawaqit/sdk';
+import { AccountDisabledError, AuthenticationError, MawaqitError } from '@mawaqit/sdk';
 
 try {
   const prayerTimes = await client.mosques.prayerTimes(uuid);
 } catch (error) {
-  if (error instanceof AuthenticationError) {
+  if (error instanceof AccountDisabledError) {
+    // Ask to confirm the email address of the account.
+  } else if (error instanceof AuthenticationError) {
     // Ask for a new token.
   } else if (error instanceof MawaqitError) {
     console.error(error.message); // Invalid token. (HTTP 401)
