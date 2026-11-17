@@ -58,7 +58,7 @@ export const CALCULATION_METHODS: Readonly<
   muslims_of_france: angles(12, 12),
   angle_15: angles(15, 15),
   algeria: angles(18, 17),
-  morocco: angles(18, 17),
+  morocco: angles(19, 17),
   egypt: angles(19.5, 17.5),
   karachi: angles(18, 18),
   umm_al_qura: { fajrAngle: 18.5, ishaAngle: null, ishaMinutesAfterMaghrib: 90 },
@@ -80,7 +80,8 @@ function angles(
   return { fajrAngle, ishaAngle, ishaMinutesAfterMaghrib: null };
 }
 
-// The countries of each method. The other countries have the Muslim World League.
+// The countries of each method. The other countries have the Muslim World League, the UK and
+// Spain too: ISNA's 15° is for North America.
 const COUNTRIES: readonly (readonly [Exclude<CalculationMethod, 'custom'>, string])[] = [
   ['angle_15', 'FR'],
   ['algeria', 'DZ'],
@@ -91,9 +92,9 @@ const COUNTRIES: readonly (readonly [Exclude<CalculationMethod, 'custom'>, strin
     'EG IQ LB SY AO BF BI BJ BW CD CF CI CM CV DJ ER ET GA GH GM GN GQ GW KE KM LR LS LY MG ML MR ' +
       'MU MW MZ NA NE NG RW SC SD SL SN SO SS ST SZ TD TG TZ UG ZA ZM ZW',
   ],
-  ['north_america', 'CA US GB ES'],
-  ['karachi', 'PK IN BD AF TN OM JO MY'],
-  ['singapore', 'SG ID'],
+  ['north_america', 'CA US'],
+  ['karachi', 'PK IN BD AF TN OM JO'],
+  ['singapore', 'SG ID MY'],
   ['gulf', 'AE'],
   ['kuwait', 'KW'],
   ['qatar', 'QA'],
