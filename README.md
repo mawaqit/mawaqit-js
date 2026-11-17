@@ -21,8 +21,8 @@ calculates prayer times for a position, without the API.
   failure.
 - **Helpers** for the prayers of a day, the next prayer and the Hijri date, which handle iqama
   offsets, Imsak, Jumu'a and daylight saving time.
-- **Prayer times for a position**, calculated offline, with the methods and country defaults of
-  MAWAQIT.
+- **Prayer times for a position**, calculated offline, with the methods of MAWAQIT and a default
+  method per country.
 - **Zero dependencies**: it only needs `fetch`, so it runs on Node.js, Deno, Bun, Cloudflare
   Workers and in browsers.
 - **Generated from the OpenAPI description of the API**, like the
